@@ -26,3 +26,8 @@ target_link_libraries(StkNoise stk)
 add_executable(StkSine src/StkSine.cpp)
 target_link_libraries(StkSine stk)
 
+
+# Target StkRT
+add_executable(StkRT src/StkRT.cpp)
+target_compile_definitions(StkRT PRIVATE -D__LINUX_ALSA__)
+target_link_libraries(StkRT stk)
