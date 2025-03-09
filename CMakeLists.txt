@@ -20,3 +20,9 @@ target_link_libraries(Main stk)
 
 add_executable(StkNoise src/StkNoise.cpp)
 target_link_libraries(StkNoise stk)
+
+
+# Target StkSine
+add_executable(StkSine src/StkSine.cpp)
+target_link_libraries(StkSine stk)
+

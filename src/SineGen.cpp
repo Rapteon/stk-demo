@@ -16,7 +16,9 @@ SineGen::~SineGen() {
   if (dac != nullptr)
     delete dac;
 }
-void SineGen::increaseFrequency() { std::cout << "Increase frequency\n"; }
+void SineGen::setFrequency(int frequency) {
+	sine.setFrequency(frequency);
+}
 
 void SineGen::play(int nFrames) {
   std::cout << "Play\n";

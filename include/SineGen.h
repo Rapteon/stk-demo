@@ -10,10 +10,53 @@ class SineGen : public TermInput::CallbackInterface {
 public:
   SineGen();
   ~SineGen();
-  void increaseFrequency();
+  void setFrequency(int frequency);
   void play(int nFrames);
   virtual void hasEvent (char ch) override{
     std::cout << "I got: " << ch << '\n';
+    switch(ch) {
+	    case 'A':
+			setFrequency(440);
+		    break;
+		case 'B':
+			setFrequency(466);
+			break;
+		case 'C':
+			setFrequency(493);
+			break;
+		case 'D':
+			setFrequency(523);
+			break;
+		case 'E':
+			setFrequency(554);
+			break;
+		case 'F':
+			setFrequency(587);
+			break;
+		case 'G':
+			setFrequency(622);
+			break;
+		case 'H':
+			setFrequency(659);
+			break;
+		case 'I':
+			setFrequency(698);
+			break;
+		case 'J':
+			setFrequency(739);
+			break;
+		case 'K':
+			setFrequency(783);
+			break;
+		case 'L':
+			setFrequency(830);
+			break;
+		case 'M':
+			setFrequency(880);
+		default:
+			return;
+	}
+	play(100);
   }
 
 private:

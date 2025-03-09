@@ -38,5 +38,6 @@ void TermInput::worker() {
     char ch {getRandomChar()};
     std::cout << ch << '\n';
     onEvent(ch);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
