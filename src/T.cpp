@@ -1,30 +1,49 @@
-// crtsine.cpp STK tutorial program
-
 #include <rtaudio/RtAudio.h>
-#include <stk/RtAudio.h>
-#include <stk/SineWave.h>
+#include <stk/BeeThree.h>
+#include <stk/Instrmnt.h>
+#include <stk/Stk.h>
 
-using namespace stk;
+/*
+Holds all class instances and data that are shared by
+processing functions.
+*/
+struct TickData {
+  TickData() : instrument{0}, scaler{1.0}, counter{0}, done{false} {}
+  stk::Instrmnt *instrument;
+  stk::StkFloat frequency;
+  stk::StkFloat scaler;
+  long counter;
+  bool done;
+};
 
-// This tick() function handles sample computation only.  It will be
-// called automatically when the system needs a new buffer of audio
-// samples.
 int tick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-         double streamTime, RtAudioStreamStatus status, void *dataPointer) {
-  SineWave *sine = (SineWave *)dataPointer;
-  StkFloat *samples = (StkFloat *)outputBuffer;
+         double streamTime, RtAudioStreamStatus status, void *userData) {
+  TickData *data = (TickData *)userData;
+  stk::StkFloat *samples = (stk::StkFloat *)outputBuffer;
 
-  for (unsigned int i = 0; i < nBufferFrames; i++)
-    *samples++ = sine->tick();
+  for (unsigned int i = 0; i < nBufferFrames; i++) {
+    *samples++ = data->instrument->tick();
+    if (++data->counter % 2000 == 0) {
+      data->scaler += 0.025;
+      data->instrument->setFrequency(data->frequency * data->scaler);
+    }
+  }
+
+  if (data->counter > 80000)
+    data->done = true;
 
   return 0;
 }
 
 int main() {
-  // Set the global sample rate before creating class instances.
-  Stk::setSampleRate(44100.0);
+  /*
+  Set the global sample rate and rawwave path before creating class
+  instances.
+  */
+  stk::Stk::setSampleRate(44100.0);
+  stk::Stk::setRawwavePath("/usr/share/stk/rawwaves/");
 
-  SineWave sine;
+  TickData data;
   RtAudio dac;
 
   // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
@@ -32,37 +51,38 @@ int main() {
   parameters.deviceId = dac.getDefaultOutputDevice();
   parameters.nChannels = 1;
   RtAudioFormat format =
-      (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-  unsigned int bufferFrames = RT_BUFFER_SIZE;
-  try {
-	  dac.openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(),
-                     &bufferFrames, &tick, (void *)&sine);
-  }
-  catch(StkError &) {
-	std::cerr << "Error opening RT stream.\n";
-	goto cleanup;
-  }
-
-  sine.setFrequency(440.0);
-
-  try {
-	dac.startStream();
-  }
-  catch(StkError &) {
-    //std::cout << dac.getErrorText() << std::endl;
-    std::cout << "Error handling at line 53 in T.cpp\n";
+      (sizeof(stk::StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+  unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
+  if (dac.openStream(&parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(),
+                     &bufferFrames, &tick, (void *)&data)) {
+    std::cout << dac.getErrorText() << std::endl;
     goto cleanup;
   }
 
-  // Block waiting here.
-  char keyhit;
-  std::cout << "\nPlaying ... press <enter> to quit.\n";
-  std::cin.get(keyhit);
+  try {
+    // Define and load the BeeThree instrument
+    data.instrument = new stk::BeeThree();
+  } catch (stk::StkError &) {
+    goto cleanup;
+  }
 
-  // Shut down the output stream.
+  data.frequency = 220.0;
+  data.instrument->noteOn(data.frequency, 0.5);
+
+  if (dac.startStream()) {
+    std::cout << dac.getErrorText() << std::endl;
+    goto cleanup;
+  }
+
+  // Block waiting until callback signals done.
+  while (!data.done)
+    stk::Stk::sleep(100);
+
+  // Shut down the callback and output stream.
   dac.closeStream();
 
 cleanup:
+  delete data.instrument;
 
   return 0;
 }
