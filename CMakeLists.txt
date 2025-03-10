@@ -7,12 +7,13 @@ set(CXX_STANDARD 17)
 
 
 # Target Main, links with stk and adds some compile time flags.
-add_executable(Main src/main.cpp src/TermInput.cpp src/SineGen.cpp)
+add_executable(Main src/main.cpp src/TermInput.cpp src/SineGen.cpp src/Utility.cpp)
 
 target_compile_definitions(Main PRIVATE -D__OS_LINUX__)
 target_include_directories(Main PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 target_link_libraries(Main stk) 
+target_link_libraries(Main rtaudio)
 
 
 

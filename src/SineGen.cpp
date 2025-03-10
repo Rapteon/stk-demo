@@ -1,31 +1,30 @@
 #include "SineGen.h"
+#include "Utility.h"
+#include <rtaudio/RtAudio.h>
 
 SineGen::SineGen() {
-  std::cout << "Created SineGen\n";
-
-  try {
-    dac = new stk::RtWvOut(1);
-  } catch (stk::StkError &) {
-    throw "Could not initialise SineGen";
-  }
-
-  sine.setFrequency(440);
+  parameters.deviceId = dac.getDefaultOutputDevice();
+  parameters.nChannels = 2;
 }
 
-SineGen::~SineGen() {
-  if (dac != nullptr)
-    delete dac;
-}
-void SineGen::setFrequency(int frequency) {
-	sine.setFrequency(frequency);
-}
+SineGen::~SineGen() { dac.closeStream(); }
+void SineGen::setFrequency(int frequency) { sine.setFrequency(frequency); }
 
 void SineGen::play(int nFrames) {
-  std::cout << "Play\n";
-  stk::StkFrames frames(nFrames, 1);
-  try {
-    dac->tick(sine.tick(frames));
-  } catch (stk::StkError &) {
-    std::cerr << "StkError during sine tick.\n";
+  RtAudioFormat format =
+      (sizeof(stk::StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+  unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
+  if (dac.openStream(&parameters, NULL, format,
+                     static_cast<unsigned int>(stk::Stk::sampleRate()),
+                     &bufferFrames, &(tick), (void *)&sine)) {
+    std::cout << dac.getErrorText() << std::endl;
+    return;
+  }
+
+  sine.setFrequency(440.0);
+
+  if (dac.startStream()) {
+    std::cout << dac.getErrorText() << std::endl;
+    return;
   }
 }
