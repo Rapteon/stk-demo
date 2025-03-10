@@ -32,3 +32,10 @@ target_link_libraries(StkSine stk)
 add_executable(StkRT src/StkRT.cpp)
 target_compile_definitions(StkRT PRIVATE -D__LINUX_ALSA__)
 target_link_libraries(StkRT stk)
+
+
+#Target T
+add_executable(T src/T.cpp)
+target_compile_definitions(T PRIVATE -D__LINUX_ALSA__)
+target_link_libraries(T stk)
+target_link_libraries(T rtaudio)
