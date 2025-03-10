@@ -34,16 +34,23 @@ int main() {
   RtAudioFormat format =
       (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = RT_BUFFER_SIZE;
-  if (dac.openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(),
-                     &bufferFrames, &tick, (void *)&sine)) {
-    std::cout << dac.getErrorText() << std::endl;
-    goto cleanup;
+  try {
+	  dac.openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(),
+                     &bufferFrames, &tick, (void *)&sine);
+  }
+  catch(StkError &) {
+	std::cerr << "Error opening RT stream.\n";
+	goto cleanup;
   }
 
   sine.setFrequency(440.0);
 
-  if (dac.startStream()) {
-    std::cout << dac.getErrorText() << std::endl;
+  try {
+	dac.startStream();
+  }
+  catch(StkError &) {
+    //std::cout << dac.getErrorText() << std::endl;
+    std::cout << "Error handling at line 53 in T.cpp\n";
     goto cleanup;
   }
 

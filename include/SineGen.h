@@ -55,6 +55,7 @@ public:
       break;
     case 'M':
       setFrequency(880);
+	  break;
     default:
       return;
     }

@@ -27,7 +27,7 @@ private:
   std::random_device rd; // obtain a random number from hardware
   std::mt19937_64 mersenne_twister{rd()};
   // ASCII codes for A till L
-  std::uniform_int_distribution<> uniform_distribution {65, 78};
+  std::uniform_int_distribution<> uniform_distribution {65, 77};
 
   void worker();
   void onEvent(char ch);
