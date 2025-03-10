@@ -37,6 +37,8 @@ void SineGen::play(int nFrames) {
     return;
 	}
 
+  // Added this sleep here because closing the stream immediately meant
+  // no audio would be played.
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	try {
