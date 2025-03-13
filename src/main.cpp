@@ -6,6 +6,7 @@
 int main() {
   stk::Stk::setSampleRate(44100);
   stk::Stk::showWarnings(true);
+  stk::Stk::setRawwavePath("/usr/share/stk/rawwaves/");
 
   int nFrames = 1000000;
 

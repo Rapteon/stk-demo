@@ -2,21 +2,26 @@
 #define SINEGEN_H
 
 #include "TermInput.h"
+#include "SynthConfig.h"
 #include <cstdlib>
 #include <rtaudio/RtAudio.h>
 #include <stk/RtAudio.h>
 #include <stk/RtWvOut.h>
 #include <stk/SineWave.h>
+#include <stk/Instrmnt.h>
 
-class SineGen : public TermInput::CallbackInterface {
+class SineGen : public TermInput::CallbackInterface
+{
 public:
   SineGen();
   ~SineGen();
   void setFrequency(int frequency);
   void play(int nFrames);
-  virtual void hasEvent(char ch) override {
+  virtual void hasEvent(char ch) override
+  {
     std::cout << "I got: " << ch << '\n';
-    switch (ch) {
+    switch (ch)
+    {
     case 'A':
       setFrequency(440);
       break;
@@ -55,7 +60,7 @@ public:
       break;
     case 'M':
       setFrequency(880);
-	  break;
+      break;
     default:
       return;
     }
@@ -66,5 +71,6 @@ private:
   stk::SineWave sine;
   RtAudio dac;
   RtAudio::StreamParameters parameters;
+  TickData data;
 };
 #endif

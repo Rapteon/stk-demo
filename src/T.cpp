@@ -53,36 +53,36 @@ int main() {
   RtAudioFormat format =
       (sizeof(stk::StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
-  if (dac.openStream(&parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(),
-                     &bufferFrames, &tick, (void *)&data)) {
-    std::cout << dac.getErrorText() << std::endl;
-    goto cleanup;
-  }
+//   if (dac.openStream(&parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(),
+//                      &bufferFrames, &tick, (void *)&data)) {
+//     std::cout << dac.getErrorText() << std::endl;
+//     goto cleanup;
+//   }
 
-  try {
-    // Define and load the BeeThree instrument
-    data.instrument = new stk::BeeThree();
-  } catch (stk::StkError &) {
-    goto cleanup;
-  }
+//   try {
+//     // Define and load the BeeThree instrument
+//     data.instrument = new stk::BeeThree();
+//   } catch (stk::StkError &) {
+//     goto cleanup;
+//   }
 
-  data.frequency = 220.0;
-  data.instrument->noteOn(data.frequency, 0.5);
+//   data.frequency = 220.0;
+//   data.instrument->noteOn(data.frequency, 0.5);
 
-  if (dac.startStream()) {
-    std::cout << dac.getErrorText() << std::endl;
-    goto cleanup;
-  }
+//   if (dac.startStream()) {
+//     std::cout << dac.getErrorText() << std::endl;
+//     goto cleanup;
+//   }
 
-  // Block waiting until callback signals done.
-  while (!data.done)
-    stk::Stk::sleep(100);
+//   // Block waiting until callback signals done.
+//   while (!data.done)
+//     stk::Stk::sleep(100);
 
-  // Shut down the callback and output stream.
-  dac.closeStream();
+//   // Shut down the callback and output stream.
+//   dac.closeStream();
 
-cleanup:
-  delete data.instrument;
+// cleanup:
+//   delete data.instrument;
 
-  return 0;
+//   return 0;
 }
